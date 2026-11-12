@@ -1,0 +1,11 @@
+prd todo list:
+[✓] Analisis skill narassa_platform.tsx + struktur peduly.com
+[✓] Scaffold proyek Next.js + Tailwind + install dependencies
+[✓] Bangun backend: db JSON, seed data, auth session, API routes
+[•] Bangun layout & komponen (Header, Footer, cards, modal, toast)
+[ ] Halaman publik: home, activity, donation, impact, feed, blog, static pages
+[ ] Halaman auth: login, register, forgot OTP
+[ ] Halaman user: profil, notifikasi, sertifikat, kalender, absensi QR
+[ ] Halaman mitra: fundraising, CSR, supporter, donasi rutin
+[ ] Admin panel: verifikasi campaign, kandidat, sertifikat, transaksi
+[ ] Verifikasi: build, typecheck, uji jalankan dev server

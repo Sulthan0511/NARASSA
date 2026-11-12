@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   PALET RESMI UI NARASSA (sesuai prompt desain):
+     Primary Green   #0D5C3A   -> varian "brand"
+     Dark Accent     #094E31   -> varian "brand-dark" (latar CTA banner)
+     Light Green Tint #E8F5E9  -> varian "brand-light" (pill/pill aktif)
+                     #F4F9F6   -> varian "brand-soft" (background lembut)
+     Text            #0F172A (slate-900) & #64748B (slate-500)
+     Alert           #E11D48 (red-600) & #D97706 (amber-600)
+   ========================================================================== */
+@theme {
+  --color-brand: #0d5c3a;
+  --color-brand-dark: #094e31;
+  --color-brand-deep: #073b25;
+  --color-brand-light: #e8f5e9;
+  --color-brand-soft: #f4f9f6;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-[#F4F9F6] text-slate-800 antialiased;
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: #0d5c3a;
+  color: white;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white;
+  }
+}
