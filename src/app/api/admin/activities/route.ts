@@ -14,6 +14,7 @@ export async function POST(req: Request) {
     deadline: string;
     quota: number;
     description: string;
+    image?: string;
   }>(req);
   if (!b.title?.trim()) return error("Judul kegiatan wajib diisi.");
 
@@ -31,7 +32,7 @@ export async function POST(req: Request) {
       deadline: b.deadline || new Date(Date.now() + 7 * 86400000).toISOString().split("T")[0],
       quota: Number(b.quota) || 20,
       registered: 0,
-      image: "https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=600&q=80",
+      image: b.image || "https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=600&q=80",
       requirements: ["Minimal 18 tahun", "Komitmen hadir tepat waktu"],
       perks: ["E-Sertifikat Resmi", "Konsumsi", "ID Card Relawan"],
       description: b.description || "Program relawan baru yang dipublikasikan administrator.",

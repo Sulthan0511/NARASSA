@@ -89,7 +89,8 @@ narassa/
 ```bash
 npm install
 cp .env.example .env.local      # Windows: copy .env.example .env.local
-# isi .env.local: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, SESSION_SECRET
+# isi .env.local: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, SESSION_SECRET,
+# NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
 npm run dev                     # buka http://localhost:3000
 ```
 
@@ -127,6 +128,8 @@ git push -u origin main
    | `SUPABASE_URL` | Project URL dari Supabase |
    | `SUPABASE_SERVICE_ROLE_KEY` | `service_role` key dari Supabase |
    | `SESSION_SECRET` | teks acak (mis. hasil `openssl rand -hex 32`) |
+   | `NEXT_PUBLIC_SUPABASE_URL` | Project URL yang sama dengan `SUPABASE_URL` |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Publishable/anon key untuk upload foto |
 
 3. Klik **Deploy**. Selesai — dapat URL produksi mis.
    `https://narassa.vercel.app`.

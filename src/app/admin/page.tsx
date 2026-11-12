@@ -80,6 +80,7 @@ export default async function AdminPage() {
             registered: a.registered,
             description: a.description,
             absenCode: a.absenCode,
+            image: a.image,
           })),
           donations: db.donations.map((d) => ({
             id: d.id,

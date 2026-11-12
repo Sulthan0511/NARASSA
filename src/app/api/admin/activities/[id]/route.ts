@@ -29,6 +29,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
     deadline?: string;
     quota?: number;
     description?: string;
+    image?: string;
   }>(req);
 
   if (b.title !== undefined && !b.title?.trim()) return error("Judul kegiatan wajib diisi.");
@@ -48,6 +49,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
     if (b.date !== undefined) act.date = b.date;
     if (b.deadline !== undefined) act.deadline = b.deadline;
     if (b.description !== undefined) act.description = b.description;
+    if (b.image !== undefined) act.image = b.image;
     if (b.quota !== undefined) {
       const q = Number(b.quota);
       // kuota tidak boleh lebih kecil dari jumlah relawan yang sudah terdaftar

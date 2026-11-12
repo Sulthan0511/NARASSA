@@ -19,6 +19,7 @@ import {
   Copy,
 } from "lucide-react";
 import QRCode from "qrcode";
+import { uploadActivityImage } from "@/lib/activity-upload";
 import { formatRupiah, formatDateId } from "@/lib/format";
 import { api, toast } from "@/lib/client";
 import type { PaymentAccount } from "@/lib/types";
@@ -36,6 +37,7 @@ export interface ActivityRow {
   registered: number;
   description: string;
   absenCode?: string;
+  image?: string;
 }
 
 /** Ringkasan program donasi untuk tabel admin (src/app/admin/page.tsx). */
@@ -119,7 +121,9 @@ export default function AdminPanel({ initial }: { initial: Initial }) {
     deadline: "",
     quota: 20,
     description: "",
+    image: "",
   });
+  const [activityPhoto, setActivityPhoto] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const router = useRouter();
 
@@ -150,7 +154,9 @@ export default function AdminPanel({ initial }: { initial: Initial }) {
       deadline: "",
       quota: 20,
       description: "",
+      image: "",
     });
+    setActivityPhoto(null);
     setShowAdd(true);
   };
 
@@ -165,7 +171,9 @@ export default function AdminPanel({ initial }: { initial: Initial }) {
       deadline: a.deadline,
       quota: a.quota,
       description: a.description,
+      image: a.image || "",
     });
+    setActivityPhoto(null);
     setShowAdd(true);
   };
 
@@ -977,15 +985,28 @@ export default function AdminPanel({ initial }: { initial: Initial }) {
       {showAdd && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 flex items-center justify-center p-4">
           <form
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
-              run(
-                () =>
-                  editId
-                    ? api(`/api/admin/activities/${editId}`, { method: "PATCH", body: newAct })
-                    : api("/api/admin/activities", { body: newAct }),
-                editId ? "Kegiatan berhasil diperbarui!" : "Kegiatan relawan baru diterbitkan!"
-              ).then(() => setShowAdd(false));
+              setBusy(true);
+              try {
+                const image = activityPhoto
+                  ? await uploadActivityImage(activityPhoto)
+                  : newAct.image;
+                const body = { ...newAct, image };
+                if (editId) {
+                  await api(`/api/admin/activities/${editId}`, { method: "PATCH", body });
+                } else {
+                  await api("/api/admin/activities", { body });
+                }
+                toast(editId ? "Kegiatan berhasil diperbarui!" : "Kegiatan relawan baru diterbitkan!");
+                setShowAdd(false);
+                setActivityPhoto(null);
+                router.refresh();
+              } catch (e: any) {
+                toast(e.message || "Gagal menyimpan kegiatan.", "error");
+              } finally {
+                setBusy(false);
+              }
             }}
             className="bg-white rounded-2xl max-w-md w-full p-5 space-y-3 text-xs max-h-[90vh] overflow-y-auto"
           >
@@ -1040,6 +1061,33 @@ export default function AdminPanel({ initial }: { initial: Initial }) {
                 className={field}
               />
             </div>
+            <div>
+              <label className="font-bold text-slate-700">Foto Kegiatan (opsional, maks. 50 MB)</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.currentTarget.files?.[0] || null;
+                  if (file && file.size > 50 * 1024 * 1024) {
+                    toast("Ukuran foto maksimal 50 MB.", "error");
+                    e.currentTarget.value = "";
+                    setActivityPhoto(null);
+                    return;
+                  }
+                  if (file && file.type && !file.type.startsWith("image/")) {
+                    toast("Pilih file foto dengan format gambar apa pun.", "error");
+                    e.currentTarget.value = "";
+                    setActivityPhoto(null);
+                    return;
+                  }
+                  setActivityPhoto(file);
+                }}
+                className={field}
+              />
+              <p className="mt-1 text-[11px] text-slate-500">
+                Format gambar bebas. {activityPhoto ? `Dipilih: ${activityPhoto.name}` : newAct.image ? "Foto saat ini tetap digunakan jika tidak memilih file baru." : "Jika kosong, foto bawaan akan digunakan."}
+              </p>
+            </div>
             <div className="grid grid-cols-3 gap-2">
               <div>
                 <label className="font-bold text-slate-700">Pelaksanaan</label>
@@ -1083,7 +1131,9 @@ export default function AdminPanel({ initial }: { initial: Initial }) {
               className="w-full py-2.5 bg-amber-500 text-slate-950 font-bold rounded-lg disabled:opacity-60"
             >
               {busy
-                ? editId
+                ? activityPhoto
+                  ? "Mengunggah foto & menyimpan..."
+                  : editId
                   ? "Menyimpan..."
                   : "Menerbitkan..."
                 : editId

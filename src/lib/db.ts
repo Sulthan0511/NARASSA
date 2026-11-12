@@ -76,12 +76,26 @@ type TableName = (typeof TABLES)[number];
 
 let supabase: SupabaseClient | null = null;
 
-function getClient(): SupabaseClient | null {
+export function getSupabaseClient(): SupabaseClient | null {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return null;
+  const projectUrl = url.trim();
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(projectUrl);
+  } catch {
+    throw new Error(
+      "SUPABASE_URL tidak valid. Isi dengan Project URL dari Supabase, contoh: https://<project-ref>.supabase.co."
+    );
+  }
+  if (!['https:', 'http:'].includes(parsedUrl.protocol) || !parsedUrl.hostname) {
+    throw new Error(
+      "SUPABASE_URL tidak valid. Isi dengan Project URL dari Supabase, contoh: https://<project-ref>.supabase.co."
+    );
+  }
   if (!supabase) {
-    supabase = createClient(url, key, {
+    supabase = createClient(projectUrl, key.trim(), {
       auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
     });
   }
@@ -90,7 +104,7 @@ function getClient(): SupabaseClient | null {
 
 /** True bila aplikasi sedang terhubung ke Supabase. */
 export function isCloudDB(): boolean {
-  return getClient() !== null;
+  return getSupabaseClient() !== null;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -143,7 +157,7 @@ function persistLocal(db: DB) {
  * @returns Promise<DB> — wajib di-`await` dari route handler / server component.
  */
 export async function getDB(): Promise<DB> {
-  const client = getClient();
+  const client = getSupabaseClient();
 
   // Mode lokal -------------------------------------------------------------
   if (!client) {
@@ -204,7 +218,7 @@ export async function mutate<T>(fn: (db: DB) => T): Promise<T> {
   );
 
   if (changed.length > 0) {
-    const client = getClient();
+    const client = getSupabaseClient();
     if (!client) {
       persistLocal(db); // mode lokal: tulis penuh ke db.json
     } else {
